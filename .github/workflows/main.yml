@@ -16,7 +16,7 @@ jobs:
       - name: Checking out sources
         uses: actions/checkout@v2
         with:
-          submodules: 'recursive'
+          submodules: "recursive"
       - name: Install build dependencies
         run: |
           dpkg --add-architecture arm64
@@ -25,3 +25,14 @@ jobs:
       - name: Build
         run: |
           dpkg-buildpackage -aarm64 -us -uc -i -b -d
+      - name: Copy binary
+        run: |
+          cp ../qv2ray_*.deb ./
+      - name: Get package name
+        id: get_package
+        run: echo ::set-output name=NAME::$(basename qv2ray_*.deb)
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: ${{ steps.get_package.outputs.NAME }}
+          path: ${{ steps.get_package.outputs.NAME }}
